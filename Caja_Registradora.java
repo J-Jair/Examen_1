@@ -8,82 +8,80 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.JComboBox;
 
 public class Caja_Registradora extends JFrame {
-    private Integer[] dinero = {100000, 50000, 20000, 10000, 5000, 2000, 1000, 500, 200, 100,50};
-    private String[] Tabla = {"Cantidad","Prestación","Denominación"};
-    private JComboBox<Integer> Respuesta;
-    private JTextField Cantidad, CanDevolver;
-    private JTable TablaResultados;
-    private DefaultTableModel ResTabla;
-    private int[] existenciasActualizadas = new int[dinero.length];
-    private JButton BtAcExistencia, BtDevolver;
-public Caja_Registradora() {
-        
+    private final Integer[] dinero = {100000, 50000, 20000, 10000, 5000, 2000, 1000, 500, 200, 100, 50};
+    private final String[] columnasTabla = {"Cantidad", "Presentación", "Denominación"};
+    private JComboBox<Integer> cbDenominaciones;
+    private JTextField txtCantidad, txtCanDevolver;
+    private JTable tablaResultados;
+    private DefaultTableModel modeloTabla;
+    private final int[] existenciasActualizadas = new int[dinero.length];
+    private JButton btnActualizarExistencia, btnDevolver;
+    private JScrollPane scrollPane;
+
+    public Caja_Registradora() {
         setSize(400, 400);
         setTitle("Caja Registradora");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
-        //Etiquetas
-        JLabel EtDenominacion = new JLabel("Denominación");
-        EtDenominacion.setBounds(90, 11, 100, 25);
-        add(EtDenominacion);
+        setResizable(false);
+        setLocationRelativeTo(null);
 
-        JLabel VaDevolver = new JLabel("Valor a devolver");
-        VaDevolver.setBounds(10, 100, 100, 25);
-        add(VaDevolver);
+        JLabel lblDenominacion = new JLabel("Denominación");
+        lblDenominacion.setBounds(90, 11, 100, 25);
+        add(lblDenominacion);
 
-        // Desplegable
-        Respuesta = new JComboBox<>();
-        Respuesta.setBounds(210, 10, 100, 25);
-        add(Respuesta);
-        DefaultComboBoxModel ResDinero = new DefaultComboBoxModel(dinero);
-        Respuesta.setModel(ResDinero);
+        JLabel lblVaDevolver = new JLabel("Valor a devolver");
+        lblVaDevolver.setBounds(10, 100, 100, 25);
+        add(lblVaDevolver);
 
-        //Botones
-        BtAcExistencia = new JButton("Actualizar Existencia");
-        BtAcExistencia.setBounds(10, 50, 160, 25);
-        add(BtAcExistencia);
+        cbDenominaciones = new JComboBox<>();
+        cbDenominaciones.setBounds(210, 10, 100, 25);
+        add(cbDenominaciones);
+        DefaultComboBoxModel<Integer> modeloDinero = new DefaultComboBoxModel<>(dinero);
+        cbDenominaciones.setModel(modeloDinero);
 
-        BtDevolver = new JButton("Devolver");
-        BtDevolver.setBounds(250, 100, 100, 25);
-        add(BtDevolver);
-        //Caja de texto
-        Cantidad = new JTextField();
-        Cantidad.setBounds(210, 50, 100, 25);
-        add(Cantidad);
+        btnActualizarExistencia = new JButton("Actualizar Existencia");
+        btnActualizarExistencia.setBounds(10, 50, 160, 25);
+        add(btnActualizarExistencia);
 
-        CanDevolver = new JTextField();
-        CanDevolver.setBounds(120, 100, 100, 25);
-        add(CanDevolver);
+        btnDevolver = new JButton("Devolver");
+        btnDevolver.setBounds(250, 100, 100, 25);
+        add(btnDevolver);
 
-        //Tabla
+        txtCantidad = new JTextField();
+        txtCantidad.setBounds(210, 50, 100, 25);
+        add(txtCantidad);
 
-        ResTabla = new DefaultTableModel(Tabla, 0);
-        TablaResultados = new JTable(ResTabla);
+        txtCanDevolver = new JTextField();
+        txtCanDevolver.setBounds(120, 100, 100, 25);
+        add(txtCanDevolver);
 
-        JScrollPane scrollPane = new JScrollPane(TablaResultados);
-        scrollPane.setBounds(10, 150, 360,200);
-        //scrollPane.setVisible(false);
+        modeloTabla = new DefaultTableModel(columnasTabla, 0);
+        tablaResultados = new JTable(modeloTabla);
+
+        scrollPane = new JScrollPane(tablaResultados);
+        scrollPane.setBounds(10, 150, 360, 200);
+        scrollPane.setVisible(false);
         add(scrollPane);
-        Actualizar_Valores ();
-    }
-    private void Actualizar_Valores () {
 
-        Respuesta.addActionListener(e -> {
-            int indice = Respuesta.getSelectedIndex();
+        inicializarEventos();
+    }
+
+    private void inicializarEventos() {
+        cbDenominaciones.addActionListener(e -> {
+            int indice = cbDenominaciones.getSelectedIndex();
             if (indice >= 0) {
-                int valorGuardado = existenciasActualizadas[indice];
-                Cantidad.setText(String.valueOf(valorGuardado));
+                txtCantidad.setText(String.valueOf(existenciasActualizadas[indice]));
             }
         });
-        BtAcExistencia.addActionListener(e -> {
-            int indice = Respuesta.getSelectedIndex();
+
+        btnActualizarExistencia.addActionListener(e -> {
+            int indice = cbDenominaciones.getSelectedIndex();
             if (indice >= 0) {
                 try {
-                    int valorIngresado = Integer.parseInt(Cantidad.getText());
-                    existenciasActualizadas[indice] = valorIngresado;
+                    int valorIngresado = Integer.parseInt(txtCantidad.getText());
                     if (valorIngresado < 0) {
                         JOptionPane.showMessageDialog(this, 
                             "No se pueden ingresar números negativos.", 
@@ -96,74 +94,85 @@ public Caja_Registradora() {
                         "Existencia actualizada correctamente.", 
                         "Éxito", 
                         JOptionPane.INFORMATION_MESSAGE);
-
-                
                 } catch (NumberFormatException ex) {
-                   
-                    JOptionPane.showMessageDialog(this,"Debe ingresar un número entero válido (sin letras ni símbolos).", 
+                    JOptionPane.showMessageDialog(this, 
+                        "Debe ingresar un número entero válido (sin letras ni símbolos).", 
                         "Error de formato", 
                         JOptionPane.ERROR_MESSAGE);
-                        
-                        
                 }
             }
         });
-        BtDevolver.addActionListener(e -> {
-            Devolucion_Total();
-        });
-    }
-    private void Devolucion_Total() {
 
+        btnDevolver.addActionListener(e -> realizarDevolucion());
+    }
+
+    private void realizarDevolucion() {
         try {
-            int valorRestante = Integer.parseInt(CanDevolver.getText().trim());
+            int valorRestante = Integer.parseInt(txtCanDevolver.getText().trim());
+            
             if (valorRestante <= 0) {
                 JOptionPane.showMessageDialog(this, 
                     "Ingrese un valor mayor a cero para devolver.", 
                     "Valor inválido", 
                     JOptionPane.ERROR_MESSAGE);
+                scrollPane.setVisible(false);
                 return;
             }
-            ResTabla.setRowCount(0);
+
+            if (valorRestante < 50) {
+                JOptionPane.showMessageDialog(this, 
+                    "El valor a devolver es menor a la denominación mínima (50).", 
+                    "Valor demasiado bajo", 
+                    JOptionPane.WARNING_MESSAGE);
+                scrollPane.setVisible(false);
+                return;
+            }
+
+            modeloTabla.setRowCount(0);
+            boolean seRealizoDesglose = false;
+
             for (int i = 0; i < dinero.length; i++) {
                 int denominacion = dinero[i];
                 int stockDisponible = existenciasActualizadas[i];
+
                 if (valorRestante >= denominacion && stockDisponible > 0) {
                     int cantidadNecesaria = valorRestante / denominacion;
                     int cantidadAUsar = Math.min(cantidadNecesaria, stockDisponible);
+
                     if (cantidadAUsar > 0) {
-                        String presentacion = (denominacion >= 1000) ? "billete" : "moneda";
+                        String presentacion = (denominacion >= 1000) ? "Billete" : "Moneda";
                         Object[] fila = { cantidadAUsar, presentacion, denominacion };
-                        ResTabla.addRow(fila);
+                        modeloTabla.addRow(fila);
                         valorRestante -= (denominacion * cantidadAUsar);
+                        seRealizoDesglose = true;
                     }
                 }
             }
-            if (valorRestante > 0) {
+
+            if (!seRealizoDesglose) {
+                scrollPane.setVisible(false);
                 JOptionPane.showMessageDialog(this, 
-                    "No hay suficiente cambio o existencias en la caja para completar la devolución exacta. Faltan: " + valorRestante, 
+                    "No hay existencias en la caja para realizar la devolucion solicitada.", 
                     "Fondos insuficientes", 
                     JOptionPane.WARNING_MESSAGE);
+                return;
             }
-            } catch (NumberFormatException ex) {
+
+            scrollPane.setVisible(true);
+
+            if (valorRestante > 0) {
+                JOptionPane.showMessageDialog(this, 
+                    "Se entregó cambio parcial. Faltan por entregar: " + valorRestante, 
+                    "Cambio incompleto", 
+                    JOptionPane.WARNING_MESSAGE);
+            }
+
+        } catch (NumberFormatException ex) {
+            scrollPane.setVisible(false);
             JOptionPane.showMessageDialog(this, 
                 "Por favor, ingrese un número válido en 'Valor a Devolver'.", 
                 "Error de formato", 
                 JOptionPane.ERROR_MESSAGE);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
-
