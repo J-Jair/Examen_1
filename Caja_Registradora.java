@@ -108,5 +108,62 @@ public Caja_Registradora() {
                 }
             }
         });
+        BtDevolver.addActionListener(e -> {
+            Devolucion_Total();
+        });
     }
+    private void Devolucion_Total() {
+
+        try {
+            int valorRestante = Integer.parseInt(CanDevolver.getText().trim());
+            if (valorRestante <= 0) {
+                JOptionPane.showMessageDialog(this, 
+                    "Ingrese un valor mayor a cero para devolver.", 
+                    "Valor inválido", 
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            ResTabla.setRowCount(0);
+            for (int i = 0; i < dinero.length; i++) {
+                int denominacion = dinero[i];
+                int stockDisponible = existenciasActualizadas[i];
+                if (valorRestante >= denominacion && stockDisponible > 0) {
+                    int cantidadNecesaria = valorRestante / denominacion;
+                    int cantidadAUsar = Math.min(cantidadNecesaria, stockDisponible);
+                    if (cantidadAUsar > 0) {
+                        String presentacion = (denominacion >= 1000) ? "billete" : "moneda";
+                        Object[] fila = { cantidadAUsar, presentacion, denominacion };
+                        ResTabla.addRow(fila);
+                        valorRestante -= (denominacion * cantidadAUsar);
+                    }
+                }
+            }
+            if (valorRestante > 0) {
+                JOptionPane.showMessageDialog(this, 
+                    "No hay suficiente cambio o existencias en la caja para completar la devolución exacta. Faltan: " + valorRestante, 
+                    "Fondos insuficientes", 
+                    JOptionPane.WARNING_MESSAGE);
+            }
+            } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, 
+                "Por favor, ingrese un número válido en 'Valor a Devolver'.", 
+                "Error de formato", 
+                JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
+
